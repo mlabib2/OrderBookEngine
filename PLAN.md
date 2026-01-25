@@ -14,7 +14,7 @@
 | Step | Description | Status |
 |------|-------------|--------|
 | 0 | Project Setup & Documentation | ✅ Complete |
-| 1 | Types Foundation (`types.hpp`) | Not Started |
+| 1 | Types Foundation (`types.hpp`) | ✅ Complete |
 | 2 | Order Structure (`order.hpp`) | Not Started |
 | 3 | Trade Structure (`trade.hpp`) | Not Started |
 | 4 | PriceLevel Class | Not Started |

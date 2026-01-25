@@ -15,7 +15,7 @@
 |------|-------------|--------|
 | 0 | Project Setup & Documentation | ✅ Complete |
 | 1 | Types Foundation (`types.hpp`) | ✅ Complete |
-| 2 | Order Structure (`order.hpp`) | Not Started |
+| 2 | Order Structure (`order.hpp`) | ✅ Complete |
 | 3 | Trade Structure (`trade.hpp`) | Not Started |
 | 4 | PriceLevel Class | Not Started |
 | 5 | OrderBook - Data Only | Not Started |

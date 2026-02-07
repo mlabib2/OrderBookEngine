@@ -70,7 +70,8 @@ struct Trade {
           Price price_,
           Quantity quantity_,
           Side aggressor_side_)
-        : id(id_)
+        : 
+        id(id_)
         , buy_order_id(buy_order_id_)
         , sell_order_id(sell_order_id_)
         , symbol(symbol_)

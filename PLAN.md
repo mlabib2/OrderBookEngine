@@ -18,8 +18,8 @@
 | 2 | Order Structure (`order.hpp`) | ✅ Complete |
 | 3 | Trade Structure (`trade.hpp`) | ✅ Complete |
 | 4 | PriceLevel Class | ✅ Complete |
-| 5 | OrderBook - Data Only | Not Started |
-| 6 | OrderBook - Matching | Not Started |
+| 5 | OrderBook - Data Only | ✅ Complete |
+| 6 | OrderBook - Matching | ✅ Complete |
 | 7 | Unit Tests | Not Started |
 | 8 | Benchmarks | Not Started |
 

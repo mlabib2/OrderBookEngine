@@ -13,11 +13,8 @@
 
 namespace orderbook {
 
-// ============================================================================
-// OrderLocation - Stores order position for O(1) cancel
-// ============================================================================
-// We store the list iterator when adding. Cancel uses it to erase in O(1).
-
+// Tracks where an order lives in the book for O(1) cancel.
+// The iterator lets us erase from std::list without searching.
 struct OrderLocation {
     Side side = Side::Buy;
     Price price = INVALID_PRICE;
@@ -25,34 +22,23 @@ struct OrderLocation {
     Order* order = nullptr;
 };
 
-// ============================================================================
-// OrderBook - Manages orders and executes price-time priority matching
-// ============================================================================
+// Order book for a single instrument. Matches orders using price-time priority.
 //
-// Data structures:
-//   bids_: map sorted descending (best = highest = begin())
-//   asks_: map sorted ascending (best = lowest = begin())
-//   order_lookup_: hash map for O(1) cancel
-//
-// Complexity: add O(log n + k matches), cancel O(1), best_bid/ask O(1)
-// Memory: OrderBook stores pointers; caller owns Order objects.
-
+// Complexity: add O(log n), cancel O(1), best_bid/ask O(1)
 class OrderBook {
 public:
     explicit OrderBook(const std::string& symbol);
     OrderBook() = default;
 
-    // Core operations
+    // Match incoming order against resting orders, return generated trades
     std::vector<Trade> add_order(Order* order);
     ErrorCode cancel_order(OrderId order_id);
 
-    // Market data
     std::optional<Price> best_bid() const noexcept;
     std::optional<Price> best_ask() const noexcept;
     std::optional<Price> spread() const noexcept;
     Quantity volume_at_price(Side side, Price price) const noexcept;
 
-    // Book state
     const std::string& symbol() const noexcept { return symbol_; }
     size_t order_count() const noexcept { return order_lookup_.size(); }
     bool empty() const noexcept { return order_lookup_.empty(); }
@@ -68,8 +54,8 @@ private:
     static bool prices_cross(const Order* incoming, Price resting_price) noexcept;
 
     std::string symbol_;
-    std::map<Price, PriceLevel, std::greater<Price>> bids_;  // Descending
-    std::map<Price, PriceLevel, std::less<Price>> asks_;     // Ascending
+    std::map<Price, PriceLevel, std::greater<Price>> bids_;  // Highest first
+    std::map<Price, PriceLevel, std::less<Price>> asks_;     // Lowest first
     std::unordered_map<OrderId, OrderLocation> order_lookup_;
     TradeId next_trade_id_ = 0;
 };

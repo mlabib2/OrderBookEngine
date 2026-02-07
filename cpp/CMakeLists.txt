@@ -64,19 +64,13 @@ endif()
 # ============================================================================
 # Core Library
 # ============================================================================
-# For now, header-only. We'll add source files as we create them.
-add_library(orderbook_core INTERFACE)
-target_include_directories(orderbook_core INTERFACE
+add_library(orderbook_core
+    src/price_level.cpp
+    src/order_book.cpp
+)
+target_include_directories(orderbook_core PUBLIC
     ${CMAKE_SOURCE_DIR}/include
 )
-
-# When we have source files, change to:
-# add_library(orderbook_core
-#     src/price_level.cpp
-#     src/orderbook.cpp
-#     src/matching_engine.cpp
-# )
-# target_include_directories(orderbook_core PUBLIC include)
 
 # ============================================================================
 # Main Executable (Demo)

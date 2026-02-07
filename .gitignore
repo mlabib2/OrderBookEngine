@@ -16,6 +16,7 @@ out/
 # IDE and editor files
 .idea/
 .vscode/
+.claude/settings.local.json
 *.swp
 *.swo
 *~

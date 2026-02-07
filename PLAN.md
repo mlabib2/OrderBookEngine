@@ -22,6 +22,7 @@
 | 6 | OrderBook - Matching | ✅ Complete |
 | 7 | Unit Tests | Not Started |
 | 8 | Benchmarks | Not Started |
+| 9 | GitHub Actions CI | Not Started |
 
 ---
 
@@ -83,6 +84,31 @@ OrderBookEngine/
 **Goal**: Measure performance against targets (<10µs add, <1µs cancel)
 **Learn**: Google Benchmark
 
+### Step 9: GitHub Actions CI
+**File**: `.github/workflows/ci.yml`
+**Goal**: Automated build, test, and benchmark tracking on every push
+**Learn**: CI/CD pipelines, continuous performance monitoring
+
+**Pipeline:**
+```
+Trigger: push + pull_request
+│
+├── Build Matrix: Ubuntu × [GCC, Clang] × [Debug, Release]
+│
+├── Steps:
+│   ├── Build project (CMake)
+│   ├── Run unit tests (GoogleTest)
+│   ├── Run sanitizers (ASan + UBSan on Debug)
+│   └── Run benchmarks + track regression ⭐
+│
+└── Artifacts: Benchmark results, status badge
+```
+
+**Why this matters:**
+- Multi-compiler catches portability issues
+- Sanitizers catch memory bugs (critical for C++)
+- Benchmark tracking shows performance awareness (impresses recruiters)
+
 ---
 
 ## Future Phases (Overview)
@@ -102,7 +128,10 @@ OrderBookEngine/
 | Price type | `int64_t` (6 decimals) | $100.50 = 100500000. Avoids float comparison bugs. |
 | Error handling | Error codes | Faster than exceptions for hot paths |
 | Order ownership | MatchingEngine owns | OrderBook holds pointers, simpler memory management |
-| Phase 1 scope | C++ engine + tests only | No Redis, Python, or WebSocket yet |
+| CI compilers | GCC + Clang | Catches different warnings, ensures portable code |
+| CI sanitizers | ASan + UBSan | Catches memory bugs, critical for C++ in trading |
+| Benchmark tracking | Yes | Prevents perf regressions, shows professionalism |
+| Phase 1 scope | C++ engine + tests + CI | No Redis, Python, or WebSocket yet |
 
 ---
 

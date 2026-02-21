@@ -7,8 +7,8 @@ A high-performance order book matching engine built in C++, with Redis pub/sub f
 | Phase | Description | Status |
 |-------|-------------|--------|
 | 1 | Core C++ Engine | ✅ Complete |
-| 2 | Redis Integration | 🔄 In Progress |
-| 3 | Python + Live Market Data | ⬜ Planned |
+| 2 | Redis Integration | ✅ Complete |
+| 3 | Python Bindings + Live Market Data | 🔄 In Progress |
 | 4 | Backtesting + Docker | ⬜ Planned |
 
 See [PLAN.md](PLAN.md) for detailed progress tracking.
@@ -20,6 +20,8 @@ See [PLAN.md](PLAN.md) for detailed progress tracking.
 - **Unit tests** — GoogleTest suite covering all core operations
 - **Benchmarks** — Google Benchmark measuring real latency
 - **Redis pub/sub** — C++ engine publishes trades to a Redis channel in real time
+- **Python subscriber** — listens on Redis and prints trades as they happen
+- **pybind11 bindings** — call the C++ engine directly from Python
 - **GitHub Actions CI** — builds and tests on every push (GCC + Clang, Debug + Release)
 
 ## Benchmark Results

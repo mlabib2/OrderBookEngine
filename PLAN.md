@@ -117,11 +117,27 @@ Trigger: push + pull_request
 |------|-------------|--------|
 | 10 | Install Redis + understand pub/sub | ✅ Complete |
 | 11 | C++ publishes trades via hiredis | ✅ Complete |
-| 12 | Python subscriber prints trades | 🔄 In Progress |
+| 12 | Python subscriber prints trades | ✅ Complete |
 
 ### What was built
 - `cpp/include/redis_publisher.hpp` + `cpp/src/redis_publisher.cpp` — `RedisPublisher` class wraps hiredis, connects on construction, publishes trade events to the `trades` channel
 - `cpp/src/main.cpp` — demo wiring OrderBook + RedisPublisher together
+- `python/subscriber.py` — Python subscribes to the `trades` channel and prints each trade
+- `python/requirements.txt` — Python dependencies
+
+---
+
+## Phase 3: Python Bindings + Live Market Data
+
+| Step | Description | Status |
+|------|-------------|--------|
+| 13 | pybind11 bindings — call C++ engine from Python | ✅ Complete |
+| 14 | Binance WebSocket — stream live market data | ⬜ Not Started |
+| 15 | Wire together — live data feeds C++ engine | ⬜ Not Started |
+
+### What was built
+- `cpp/bindings/orderbook_bindings.cpp` — exposes `OrderBook` and `Trade` to Python via pybind11
+- Python can now do: `book = orderbook_engine.OrderBook("AAPL")` and call `add_order`, `cancel_order`, `best_bid`, `best_ask`
 
 ---
 
@@ -129,7 +145,6 @@ Trigger: push + pull_request
 
 | Phase | Focus | Key Components |
 |-------|-------|----------------|
-| 3 | Market Data + Python | Binance WebSocket, pybind11 |
 | 4 | Backtesting + Polish | Python engine, strategies, Docker |
 
 ---

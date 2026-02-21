@@ -9,7 +9,7 @@ A high-performance order book matching engine built in C++, with Redis pub/sub f
 | 1 | Core C++ Engine + Tests + CI | ✅ Complete |
 | 2 | Redis Integration | ✅ Complete |
 | 3 | Python Bindings + Live Market Data | ✅ Complete |
-| 4 | Docker + Backtesting + Strategy | 🔄 In Progress |
+| 4 | Docker + Backtesting + Strategy | ✅ Complete |
 
 See [PLAN.md](PLAN.md) for detailed progress tracking.
 
@@ -24,6 +24,8 @@ See [PLAN.md](PLAN.md) for detailed progress tracking.
 - **Binance WebSocket feed** — streams live BTCUSDT order book data into the C++ engine every 100ms
 - **End-to-end trade pipeline** — Binance → Python → C++ engine → Redis → subscriber
 - **Docker Compose** — `docker compose up` runs the full pipeline, no local setup needed
+- **Backtesting framework** — replays 1 year of historical BTCUSDT data through the C++ engine, reports Sharpe ratio, max drawdown, total return
+- **Market-making strategy** — quotes around mid price using live order book state (best bid/ask), with inventory risk controls
 - **GitHub Actions CI** — builds and tests on every push (GCC + Clang, Debug + Release)
 
 ## Architecture
@@ -126,6 +128,8 @@ OrderBookEngine/
 └── python/
     ├── binance_feed.py          # WebSocket → C++ engine → Redis
     ├── subscriber.py            # Redis trade subscriber
+    ├── backtest.py              # Historical data replay + performance metrics
+    ├── strategy.py              # Market-making strategy (order book aware)
     └── requirements.txt
 ```
 
@@ -172,6 +176,30 @@ redis-server
 python python/subscriber.py       # terminal 1: listen for trades
 python python/binance_feed.py     # terminal 2: stream live data
 ```
+
+## Running the Backtest
+
+```bash
+source .venv/bin/activate
+python python/backtest.py
+```
+
+Downloads 1 year of BTC-USD daily data from Yahoo Finance, replays each tick through the C++ engine via pybind11, runs the market-making strategy, and prints:
+
+```
+=============================================
+  BACKTEST RESULTS — BTCUSDT (1 year daily)
+=============================================
+  Starting capital : $  100,000.00
+  Ending value     : $   69,102.80
+  Total return     :      -30.9%
+  Sharpe ratio     :        -0.52
+  Max drawdown     :       49.4%
+  Days traded      :          366
+=============================================
+```
+
+The negative return reflects BTC's price decline over the period and the inherent limitation of running a market-making strategy on daily bars. Real market making operates at microsecond granularity with tick-level data.
 
 ## Running the C++ Demo (Redis pub/sub only)
 

@@ -16,7 +16,7 @@
 | 1 | Core C++ Engine + Tests + CI | ✅ Complete |
 | 2 | Redis Integration | ✅ Complete |
 | 3 | Python Bindings + Live Market Data | ✅ Complete |
-| 4 | Docker + Backtesting + Strategy | 🔄 In Progress |
+| 4 | Docker + Backtesting + Strategy | ✅ Complete |
 
 ---
 
@@ -112,8 +112,8 @@ subscriber.py  →  prints trade
 | Step | Description | Status |
 |------|-------------|--------|
 | 17 | Docker Compose — containerize full pipeline | ✅ Complete |
-| 18 | Backtesting framework — replay historical data | ⬜ Not Started |
-| 19 | Market-making strategy | ⬜ Not Started |
+| 18 | Backtesting framework — replay historical data | ✅ Complete |
+| 19 | Market-making strategy | ✅ Complete |
 
 ### Step 17: Docker Compose ✅
 **Files**: `Dockerfile.engine`, `Dockerfile.subscriber`, `docker-compose.yml`, `.dockerignore`
@@ -125,13 +125,26 @@ Three containers:
 
 `REDIS_HOST` environment variable lets the same Python code work locally (`127.0.0.1`) and in Docker (`redis` service name).
 
-### Step 18: Backtesting ⬜
-**Goal**: Replay historical BTCUSDT CSV data through the C++ engine tick by tick, measure strategy P&L
-**Key metrics**: Sharpe ratio, max drawdown, total return, number of trades
+### Step 18: Backtesting ✅
+**File**: `python/backtest.py`
+**Goal**: Replay 1 year of historical BTCUSDT daily data through the C++ engine tick by tick
+**Key metrics**: Total return, Sharpe ratio, max drawdown, days traded
+**How it works**: yfinance downloads OHLCV data → each day feeds a bid/ask into the C++ OrderBook via pybind11 → strategy decides buy/sell/hold → P&L tracked mark-to-market
 
-### Step 19: Market-Making Strategy ⬜
-**Goal**: Simple market-making on top of the backtester
-**Logic**: Post buy slightly below mid, post sell slightly above mid, collect the spread, manage inventory risk
+### Step 19: Market-Making Strategy ✅
+**File**: `python/strategy.py`
+**Goal**: Strategy that uses order book state (best_bid, best_ask, mid price) — not moving averages
+**Logic**:
+- Compute mid = (best_bid + best_ask) / 2
+- Post quotes HALF_SPREAD (0.1%) away from mid on each side
+- Buy when market ask ≤ our target ask (lift the offer)
+- Sell when market bid ≥ our target bid (hit the bid)
+- Inventory cap: never hold more than 5 BTC (risk control)
+- Cash reserve: always keep $1,000 minimum
+
+**Backtest result** (1 year BTC-USD daily data, $100K starting capital):
+- Total return: -30.9% | Sharpe: -0.52 | Max drawdown: 49.4%
+- Result is expected: BTC declined over the period; daily bars are too coarse for real market making (which operates at microsecond granularity with tick data)
 
 ---
 

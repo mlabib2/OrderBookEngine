@@ -58,6 +58,14 @@ if(BUILD_BENCHMARKS)
         GIT_TAG v1.8.3
     )
     set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    # Force std::regex backend — the try_compile detection fails on some
+    # macOS/Clang setups because it doesn't inherit our CXX_STANDARD flags.
+    set(HAVE_STD_REGEX ON CACHE BOOL "" FORCE)
+    # Suppress -Wgnu-include-next which Clang-on-macOS promotes to an error
+    # inside Google Benchmark's own build when it hits system libc++ headers.
+    if(APPLE)
+        add_compile_options(-Wno-gnu-include-next)
+    endif()
     FetchContent_MakeAvailable(benchmark)
 endif()
 
@@ -100,12 +108,11 @@ endif()
 # Benchmarks
 # ============================================================================
 if(BUILD_BENCHMARKS)
-    # Uncomment when benchmark files exist:
-    # add_executable(latency_benchmark benchmarks/latency_benchmark.cpp)
-    # target_link_libraries(latency_benchmark PRIVATE
-    #     orderbook_core
-    #     benchmark::benchmark
-    # )
+    add_executable(latency_benchmark benchmarks/latency_benchmark.cpp)
+    target_link_libraries(latency_benchmark PRIVATE
+        orderbook_core
+        benchmark::benchmark_main
+    )
 endif()
 
 # ============================================================================

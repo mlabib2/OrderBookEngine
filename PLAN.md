@@ -21,7 +21,7 @@
 | 5 | OrderBook - Data Only | ✅ Complete |
 | 6 | OrderBook - Matching | ✅ Complete |
 | 7 | Unit Tests | ✅ Complete |
-| 8 | Benchmarks | Not Started |
+| 8 | Benchmarks | ✅ Complete |
 | 9 | GitHub Actions CI | ✅ Complete |
 
 ---

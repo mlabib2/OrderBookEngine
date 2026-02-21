@@ -4,6 +4,8 @@ import sys
 import os
 import redis
 
+REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
+
 # Add the build directory so Python can find the compiled C++ module
 sys.path.append(os.path.join(os.path.dirname(__file__), "../cpp/build"))
 import orderbook_engine
@@ -15,7 +17,7 @@ URL = "wss://stream.binance.com:9443/ws/btcusdt@depth10@100ms"
 book = orderbook_engine.OrderBook("BTCUSDT")
 
 # Redis client — publishes matched trades to the "trades" channel
-r = redis.Redis(host="127.0.0.1", port=6379)
+r = redis.Redis(host=REDIS_HOST, port=6379)
 
 
 def on_message(ws, message):

@@ -1,0 +1,34 @@
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during apt installs
+ENV DEBIAN_FRONTEND=noninteractive
+
+# ── System deps ────────────────────────────────────────────────────────────────
+RUN apt-get update && apt-get install -y \
+    cmake \
+    g++ \
+    git \
+    python3 \
+    python3-pip \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# ── Copy source ────────────────────────────────────────────────────────────────
+COPY cpp/ cpp/
+COPY python/ python/
+
+# ── Build C++ engine (Release, no tests or benchmarks) ─────────────────────────
+RUN cmake -B cpp/build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_TESTS=OFF \
+        -DBUILD_BENCHMARKS=OFF \
+        -S cpp \
+    && cmake --build cpp/build --parallel
+
+# ── Python deps ────────────────────────────────────────────────────────────────
+RUN pip3 install --no-cache-dir -r python/requirements.txt
+
+# The pybind11 .so is in cpp/build — binance_feed.py already appends this path
+CMD ["python3", "python/binance_feed.py"]

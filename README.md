@@ -26,6 +26,76 @@ See [PLAN.md](PLAN.md) for detailed progress tracking.
 - **Docker Compose** — `docker compose up` runs the full pipeline, no local setup needed
 - **GitHub Actions CI** — builds and tests on every push (GCC + Clang, Debug + Release)
 
+## Architecture
+
+### System Pipeline
+
+```mermaid
+graph TD
+    BINANCE["🌐 Binance WebSocket\nbtcusdt@depth10@100ms\n(external)"]
+
+    subgraph engine ["🐳 Docker: engine"]
+        FEED["binance_feed.py\nPython"]
+        subgraph cpp ["C++ Engine (pybind11)"]
+            BOOK["OrderBook"]
+            BIDS["Bids\nstd::map descending\nFIFO queue per level"]
+            ASKS["Asks\nstd::map ascending\nFIFO queue per level"]
+            BOOK --- BIDS
+            BOOK --- ASKS
+        end
+        FEED <-->|"FFI call\nreturns Trade list"| BOOK
+    end
+
+    subgraph redis ["🐳 Docker: redis"]
+        REDIS[("Redis\n'trades' pub/sub channel")]
+    end
+
+    subgraph subscriber ["🐳 Docker: subscriber"]
+        SUB["subscriber.py\nPython"]
+    end
+
+    BINANCE -->|"JSON: best bid + ask\nevery 100ms"| FEED
+    FEED -->|"PUBLISH trades"| REDIS
+    REDIS -->|"SUBSCRIBE trades"| SUB
+```
+
+### Order Book Internals
+
+When a new order arrives, the engine checks if it crosses the opposite side. If bid ≥ ask, a trade is generated at the resting order's price (price-time priority).
+
+```
+                    ORDER BOOK: BTCUSDT
+    ┌──────────────────────────────────────────────┐
+    │               ASKS  (sell orders)            │
+    │                                              │
+    │  Price        Queue (FIFO → oldest first)    │
+    │  68,140.00  [ 750 ]──[ 300 ]                 │
+    │  68,139.00  [ 200 ]                          │
+    │  68,138.00  [ 500 ]──[ 1000 ]  ← best ask   │
+    ├──────────────────────────────────────────────┤
+    │           spread = $0.01                     │
+    ├──────────────────────────────────────────────┤
+    │               BIDS  (buy orders)             │
+    │                                              │
+    │  68,137.99  [ 800 ]──[ 400 ]   ← best bid   │
+    │  68,137.00  [ 600 ]                          │
+    │  68,136.00  [ 1200 ]                         │
+    └──────────────────────────────────────────────┘
+
+    New BUY @ 68,138.00 → crosses best ask → MATCH
+    Trade: price=68138.00, qty=min(incoming, resting)
+    → published to Redis "trades" channel
+```
+
+### Complexity
+
+| Operation | Complexity | Data Structure |
+|-----------|-----------|----------------|
+| Add order | O(log n) | `std::map` insert |
+| Cancel order | O(1) | `std::unordered_map` id → iterator |
+| Match order | O(k) | Walk price levels until filled (k = levels crossed) |
+| Best bid/ask | O(1) | `std::map::rbegin` / `begin` |
+
 ## Benchmark Results
 
 | Operation | Latency | Throughput |

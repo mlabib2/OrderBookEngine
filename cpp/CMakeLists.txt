@@ -75,17 +75,21 @@ endif()
 add_library(orderbook_core
     src/price_level.cpp
     src/order_book.cpp
+    src/redis_publisher.cpp
 )
 target_include_directories(orderbook_core PUBLIC
     ${CMAKE_SOURCE_DIR}/include
+    /opt/homebrew/Cellar/hiredis/1.3.0/include
+)
+target_link_libraries(orderbook_core PUBLIC
+    /opt/homebrew/Cellar/hiredis/1.3.0/lib/libhiredis.dylib
 )
 
 # ============================================================================
 # Main Executable (Demo)
 # ============================================================================
-# Uncomment when main.cpp exists:
-# add_executable(orderbook_demo src/main.cpp)
-# target_link_libraries(orderbook_demo PRIVATE orderbook_core)
+add_executable(orderbook_demo src/main.cpp)
+target_link_libraries(orderbook_demo PRIVATE orderbook_core)
 
 # ============================================================================
 # Unit Tests

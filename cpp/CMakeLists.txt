@@ -18,6 +18,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Release: Maximum optimization
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native")
 
+# On macOS the C++ standard library headers live inside the SDK.
+# When cmake sets CMAKE_OSX_SYSROOT the compiler needs an explicit -I to find them.
+if(APPLE)
+    execute_process(
+        COMMAND xcrun --show-sdk-path
+        OUTPUT_VARIABLE MACOS_SDK_PATH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    include_directories(SYSTEM ${MACOS_SDK_PATH}/usr/include/c++/v1)
+endif()
+
 # Debug: Sanitizers for catching bugs
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fsanitize=address,undefined -fno-omit-frame-pointer")
 
@@ -128,6 +139,27 @@ if(BUILD_BENCHMARKS)
         orderbook_core
         benchmark::benchmark_main
     )
+endif()
+
+# ============================================================================
+# Python Bindings (pybind11)
+# ============================================================================
+option(BUILD_BINDINGS "Build Python bindings" ON)
+
+if(BUILD_BINDINGS)
+    find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+    # Tell pybind11 to reuse the Python3 we already found above,
+    # instead of running its own detection (which can pick up the wrong venv)
+    set(PYBIND11_FINDPYTHON ON)
+    FetchContent_Declare(
+        pybind11
+        GIT_REPOSITORY https://github.com/pybind/pybind11.git
+        GIT_TAG        v2.13.6
+    )
+    FetchContent_MakeAvailable(pybind11)
+
+    pybind11_add_module(orderbook_engine bindings/orderbook_bindings.cpp)
+    target_link_libraries(orderbook_engine PRIVATE orderbook_core)
 endif()
 
 # ============================================================================

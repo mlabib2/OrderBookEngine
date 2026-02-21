@@ -62,6 +62,10 @@ public:
     // The iterator must be valid and point to an order in this level
     void remove_order(OrderIterator it);
 
+    // Decrease total_quantity_ by qty — called during matching when a fill occurs
+    // so that total_quantity_ stays in sync even for partially filled resting orders.
+    void reduce_quantity(Quantity qty) noexcept;
+
     // ========================================================================
     // Accessors
     // ========================================================================

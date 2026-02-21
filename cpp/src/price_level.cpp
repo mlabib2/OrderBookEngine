@@ -29,12 +29,13 @@ PriceLevel::OrderIterator PriceLevel::add_order(Order* order) {
 }
 
 void PriceLevel::remove_order(OrderIterator it) {
-    // Subtract from cached total before removing
     Order* order = *it;
     total_quantity_ -= order->remaining_quantity();
-
-    // Remove from list (O(1) with iterator)
     orders_.erase(it);
+}
+
+void PriceLevel::reduce_quantity(Quantity qty) noexcept {
+    total_quantity_ -= qty;
 }
 
 // ============================================================================

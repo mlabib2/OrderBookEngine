@@ -83,18 +83,17 @@ target_include_directories(orderbook_core PUBLIC
 # Unit Tests
 # ============================================================================
 if(BUILD_TESTS)
-    # Uncomment when test files exist:
-    # add_executable(orderbook_tests
-    #     tests/test_order.cpp
-    #     tests/test_orderbook.cpp
-    #     tests/test_matching.cpp
-    # )
-    # target_link_libraries(orderbook_tests PRIVATE
-    #     orderbook_core
-    #     GTest::gtest_main
-    # )
-    # include(GoogleTest)
-    # gtest_discover_tests(orderbook_tests)
+    add_executable(orderbook_tests
+        tests/test_order.cpp
+        tests/test_price_level.cpp
+        tests/test_order_book.cpp
+    )
+    target_link_libraries(orderbook_tests PRIVATE
+        orderbook_core
+        GTest::gtest_main
+    )
+    include(GoogleTest)
+    gtest_discover_tests(orderbook_tests)
 endif()
 
 # ============================================================================

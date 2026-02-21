@@ -20,9 +20,9 @@
 | 4 | PriceLevel Class | ✅ Complete |
 | 5 | OrderBook - Data Only | ✅ Complete |
 | 6 | OrderBook - Matching | ✅ Complete |
-| 7 | Unit Tests | Not Started |
+| 7 | Unit Tests | ✅ Complete |
 | 8 | Benchmarks | Not Started |
-| 9 | GitHub Actions CI | Not Started |
+| 9 | GitHub Actions CI | ✅ Complete |
 
 ---
 

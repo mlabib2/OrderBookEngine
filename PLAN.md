@@ -117,7 +117,7 @@ Trigger: push + pull_request
 |------|-------------|--------|
 | 10 | Install Redis + understand pub/sub | ✅ Complete |
 | 11 | C++ publishes trades via hiredis | ✅ Complete |
-| 12 | Python subscriber prints trades | ⬜ Not Started |
+| 12 | Python subscriber prints trades | 🔄 In Progress |
 
 ### What was built
 - `cpp/include/redis_publisher.hpp` + `cpp/src/redis_publisher.cpp` — `RedisPublisher` class wraps hiredis, connects on construction, publishes trade events to the `trades` channel

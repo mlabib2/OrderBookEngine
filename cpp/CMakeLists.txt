@@ -79,11 +79,21 @@ add_library(orderbook_core
 )
 target_include_directories(orderbook_core PUBLIC
     ${CMAKE_SOURCE_DIR}/include
-    /opt/homebrew/Cellar/hiredis/1.3.0/include
 )
-target_link_libraries(orderbook_core PUBLIC
-    /opt/homebrew/Cellar/hiredis/1.3.0/lib/libhiredis.dylib
+
+# Find hiredis (works on both macOS/homebrew and Ubuntu/apt)
+find_path(HIREDIS_INCLUDE_DIR hiredis/hiredis.h
+    PATHS /opt/homebrew/include /usr/include /usr/local/include
 )
+find_library(HIREDIS_LIBRARY hiredis
+    PATHS /opt/homebrew/lib /usr/lib /usr/local/lib
+)
+if(NOT HIREDIS_INCLUDE_DIR OR NOT HIREDIS_LIBRARY)
+    message(FATAL_ERROR "hiredis not found. Install with: brew install hiredis  OR  apt install libhiredis-dev")
+endif()
+
+target_include_directories(orderbook_core PUBLIC ${HIREDIS_INCLUDE_DIR})
+target_link_libraries(orderbook_core PUBLIC ${HIREDIS_LIBRARY})
 
 # ============================================================================
 # Main Executable (Demo)

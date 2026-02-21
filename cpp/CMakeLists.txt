@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(OrderBookEngine
     VERSION 1.0.0
-    LANGUAGES CXX
+    LANGUAGES C CXX
     DESCRIPTION "Low-latency order book matching engine"
 )
 
@@ -81,43 +81,20 @@ target_include_directories(orderbook_core PUBLIC
     ${CMAKE_SOURCE_DIR}/include
 )
 
-# Find hiredis: try pkg-config first, fall back to manual search.
-# pkg-config works on macOS/Homebrew and Ubuntu 24+.
-# Manual search covers Ubuntu 22 (hiredis 0.14 ships without a .pc file).
-find_package(PkgConfig)
-if(PkgConfig_FOUND)
-    pkg_check_modules(HIREDIS hiredis)
-endif()
-if(NOT HIREDIS_FOUND)
-    find_path(HIREDIS_INCLUDE_DIR
-        NAMES hiredis/hiredis.h
-        HINTS /opt/homebrew/include /usr/include /usr/local/include
-    )
-    find_library(HIREDIS_LIBRARY
-        NAMES hiredis
-        HINTS
-            /opt/homebrew/lib
-            /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}
-            /usr/lib/x86_64-linux-gnu
-            /usr/lib/aarch64-linux-gnu
-            /usr/lib
-            /usr/local/lib
-    )
-    if(HIREDIS_INCLUDE_DIR AND HIREDIS_LIBRARY)
-        set(HIREDIS_INCLUDE_DIRS ${HIREDIS_INCLUDE_DIR})
-        set(HIREDIS_LIBRARIES    ${HIREDIS_LIBRARY})
-        set(HIREDIS_FOUND TRUE)
-    endif()
-endif()
-if(NOT HIREDIS_FOUND)
-    message(FATAL_ERROR "hiredis not found. Install: brew install hiredis  OR  apt install libhiredis-dev")
-endif()
+# hiredis - built from source via FetchContent (same pattern as GoogleTest
+# and Google Benchmark — no system package required, works on all platforms)
+FetchContent_Declare(
+    hiredis
+    GIT_REPOSITORY https://github.com/redis/hiredis.git
+    GIT_TAG v1.2.0
+)
+set(ENABLE_SSL       OFF CACHE BOOL "" FORCE)
+set(DISABLE_TESTS    ON  CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(hiredis)
 
-target_include_directories(orderbook_core PUBLIC ${HIREDIS_INCLUDE_DIRS})
-target_link_libraries(orderbook_core PUBLIC ${HIREDIS_LIBRARIES})
-if(HIREDIS_LIBRARY_DIRS)
-    target_link_directories(orderbook_core PUBLIC ${HIREDIS_LIBRARY_DIRS})
-endif()
+target_link_libraries(orderbook_core PUBLIC hiredis)
+target_include_directories(orderbook_core PUBLIC ${hiredis_SOURCE_DIR})
 
 # ============================================================================
 # Main Executable (Demo)

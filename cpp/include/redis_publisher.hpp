@@ -2,7 +2,7 @@
 #define ORDERBOOK_REDIS_PUBLISHER_HPP
 
 #include "trade.hpp"
-#include <hiredis/hiredis.h>
+#include <hiredis.h>
 #include <string>
 
 namespace orderbook {

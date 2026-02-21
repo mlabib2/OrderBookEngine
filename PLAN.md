@@ -135,7 +135,7 @@ Trigger: push + pull_request
 | 14 | Binance WebSocket — stream live market data | ✅ Complete |
 | 15 | Wire together — live data feeds C++ engine | ✅ Complete |
 | 16 | Publish matched trades from Python to Redis | ✅ Complete |
-| 17 | Docker Compose + venv — containerize + proper Python env | ⬜ Not Started |
+| 17 | Docker Compose + venv — containerize + proper Python env | ✅ Complete |
 
 ### What was built
 - `cpp/bindings/orderbook_bindings.cpp` — exposes `OrderBook` and `Trade` to Python via pybind11

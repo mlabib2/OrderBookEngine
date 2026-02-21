@@ -44,6 +44,7 @@ dist/
 *.egg
 .eggs/
 venv/
+.venv/
 env/
 .env
 

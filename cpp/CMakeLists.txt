@@ -81,13 +81,31 @@ target_include_directories(orderbook_core PUBLIC
     ${CMAKE_SOURCE_DIR}/include
 )
 
-# Find hiredis via pkg-config (works on macOS/homebrew and Ubuntu/apt)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(HIREDIS REQUIRED hiredis)
+# Find hiredis: try pkg-config first, fall back to manual search.
+# pkg-config works on macOS/Homebrew and Ubuntu 24+.
+# Manual search covers Ubuntu 22 (hiredis 0.14 ships without a .pc file).
+find_package(PkgConfig)
+if(PkgConfig_FOUND)
+    pkg_check_modules(HIREDIS hiredis)
+endif()
+if(NOT HIREDIS_FOUND)
+    find_path(HIREDIS_INCLUDE_DIR hiredis/hiredis.h)
+    find_library(HIREDIS_LIBRARY hiredis)
+    if(HIREDIS_INCLUDE_DIR AND HIREDIS_LIBRARY)
+        set(HIREDIS_INCLUDE_DIRS ${HIREDIS_INCLUDE_DIR})
+        set(HIREDIS_LIBRARIES    ${HIREDIS_LIBRARY})
+        set(HIREDIS_FOUND TRUE)
+    endif()
+endif()
+if(NOT HIREDIS_FOUND)
+    message(FATAL_ERROR "hiredis not found. Install: brew install hiredis  OR  apt install libhiredis-dev")
+endif()
 
 target_include_directories(orderbook_core PUBLIC ${HIREDIS_INCLUDE_DIRS})
 target_link_libraries(orderbook_core PUBLIC ${HIREDIS_LIBRARIES})
-target_link_directories(orderbook_core PUBLIC ${HIREDIS_LIBRARY_DIRS})
+if(HIREDIS_LIBRARY_DIRS)
+    target_link_directories(orderbook_core PUBLIC ${HIREDIS_LIBRARY_DIRS})
+endif()
 
 # ============================================================================
 # Main Executable (Demo)

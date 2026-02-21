@@ -2,6 +2,7 @@ import websocket
 import json
 import sys
 import os
+import redis
 
 # Add the build directory so Python can find the compiled C++ module
 sys.path.append(os.path.join(os.path.dirname(__file__), "../cpp/build"))
@@ -12,6 +13,9 @@ URL = "wss://stream.binance.com:9443/ws/btcusdt@depth10@100ms"
 
 # One order book for BTCUSDT, shared across all messages
 book = orderbook_engine.OrderBook("BTCUSDT")
+
+# Redis client — publishes matched trades to the "trades" channel
+r = redis.Redis(host="127.0.0.1", port=6379)
 
 
 def on_message(ws, message):
@@ -28,13 +32,20 @@ def on_message(ws, message):
     ask_price = float(best_ask[0])
     ask_qty   = int(float(best_ask[1]) * 1000)
 
-    # Feed into C++ engine
-    book.add_order("buy",  bid_price, bid_qty)
-    book.add_order("sell", ask_price, ask_qty)
+    # Feed into C++ engine — each call returns a list of Trade objects
+    buy_trades  = book.add_order("buy",  bid_price, bid_qty)
+    sell_trades = book.add_order("sell", ask_price, ask_qty)
+
+    # Publish any matched trades to Redis
+    for t in buy_trades + sell_trades:
+        msg = f"symbol=BTCUSDT price={t.price():.2f} qty={t.quantity}"
+        r.publish("trades", msg)
+        print(f"  TRADE: {msg}")
 
     # Print current top of book
+    spread = book.spread()
     print(f"BID {bid_price:.2f} x {bid_qty}  |  ASK {ask_price:.2f} x {ask_qty}"
-          f"  |  spread = {book.spread():.2f}" if book.spread() else "")
+          + (f"  |  spread = {spread:.2f}" if spread else ""))
 
 
 def on_error(ws, error):

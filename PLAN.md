@@ -134,11 +134,14 @@ Trigger: push + pull_request
 | 13 | pybind11 bindings — call C++ engine from Python | ✅ Complete |
 | 14 | Binance WebSocket — stream live market data | ✅ Complete |
 | 15 | Wire together — live data feeds C++ engine | ✅ Complete |
-| 16 | Docker Compose + venv — containerize + proper Python env | ⬜ Not Started |
+| 16 | Publish matched trades from Python to Redis | ✅ Complete |
+| 17 | Docker Compose + venv — containerize + proper Python env | ⬜ Not Started |
 
 ### What was built
 - `cpp/bindings/orderbook_bindings.cpp` — exposes `OrderBook` and `Trade` to Python via pybind11
 - Python can now do: `book = orderbook_engine.OrderBook("AAPL")` and call `add_order`, `cancel_order`, `best_bid`, `best_ask`
+- `python/binance_feed.py` — captures trades returned by `add_order` and publishes them to Redis `trades` channel
+- Full pipeline verified live: Binance WebSocket → Python → C++ engine → Redis → subscriber
 
 ---
 

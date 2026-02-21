@@ -8,7 +8,7 @@ A high-performance order book matching engine built in C++, with Redis pub/sub f
 |-------|-------------|--------|
 | 1 | Core C++ Engine | ✅ Complete |
 | 2 | Redis Integration | ✅ Complete |
-| 3 | Python Bindings + Live Market Data | ✅ Complete |
+| 3 | Python Bindings + Live Market Data + Redis wiring | ✅ Complete |
 | 4 | Docker + Backtesting + Strategy | ⬜ Planned |
 
 See [PLAN.md](PLAN.md) for detailed progress tracking.
@@ -23,6 +23,7 @@ See [PLAN.md](PLAN.md) for detailed progress tracking.
 - **Python subscriber** — listens on Redis and prints trades as they happen
 - **pybind11 bindings** — call the C++ engine directly from Python
 - **Binance WebSocket feed** — streams live BTCUSDT order book data into the C++ engine every 100ms
+- **End-to-end trade pipeline** — matched trades flow: Binance → Python → C++ engine → Redis → subscriber
 - **GitHub Actions CI** — builds and tests on every push (GCC + Clang, Debug + Release)
 
 ## Benchmark Results

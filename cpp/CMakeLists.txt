@@ -88,6 +88,9 @@ add_library(orderbook_core
     src/order_book.cpp
     src/redis_publisher.cpp
 )
+# -fPIC required on Linux when orderbook_core is linked into the pybind11
+# shared module (.so). Harmless on macOS.
+set_target_properties(orderbook_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(orderbook_core PUBLIC
     ${CMAKE_SOURCE_DIR}/include
 )

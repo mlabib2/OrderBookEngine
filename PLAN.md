@@ -111,11 +111,20 @@ Trigger: push + pull_request
 
 ---
 
+## Phase 2: Redis Integration
+
+| Step | Description | Status |
+|------|-------------|--------|
+| 10 | Install Redis + understand pub/sub | ✅ Complete |
+| 11 | C++ publishes trades via hiredis | ✅ Complete |
+| 12 | Python subscriber prints trades | ⬜ Not Started |
+
+---
+
 ## Future Phases (Overview)
 
 | Phase | Focus | Key Components |
 |-------|-------|----------------|
-| 2 | Redis Integration | State sharing, pub/sub |
 | 3 | Market Data + Python | Binance WebSocket, pybind11 |
 | 4 | Backtesting + Polish | Python engine, strategies, Docker |
 

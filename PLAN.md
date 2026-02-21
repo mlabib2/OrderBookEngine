@@ -132,7 +132,7 @@ Trigger: push + pull_request
 | Step | Description | Status |
 |------|-------------|--------|
 | 13 | pybind11 bindings — call C++ engine from Python | ✅ Complete |
-| 14 | Binance WebSocket — stream live market data | 🔄 In Progress |
+| 14 | Binance WebSocket — stream live market data | ✅ Complete |
 | 15 | Wire together — live data feeds C++ engine | ✅ Complete |
 | 16 | Docker Compose + venv — containerize + proper Python env | ⬜ Not Started |
 

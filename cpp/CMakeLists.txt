@@ -89,8 +89,20 @@ if(PkgConfig_FOUND)
     pkg_check_modules(HIREDIS hiredis)
 endif()
 if(NOT HIREDIS_FOUND)
-    find_path(HIREDIS_INCLUDE_DIR hiredis/hiredis.h)
-    find_library(HIREDIS_LIBRARY hiredis)
+    find_path(HIREDIS_INCLUDE_DIR
+        NAMES hiredis/hiredis.h
+        HINTS /opt/homebrew/include /usr/include /usr/local/include
+    )
+    find_library(HIREDIS_LIBRARY
+        NAMES hiredis
+        HINTS
+            /opt/homebrew/lib
+            /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}
+            /usr/lib/x86_64-linux-gnu
+            /usr/lib/aarch64-linux-gnu
+            /usr/lib
+            /usr/local/lib
+    )
     if(HIREDIS_INCLUDE_DIR AND HIREDIS_LIBRARY)
         set(HIREDIS_INCLUDE_DIRS ${HIREDIS_INCLUDE_DIR})
         set(HIREDIS_LIBRARIES    ${HIREDIS_LIBRARY})

@@ -1,20 +1,35 @@
 # Low-Latency Order Book Engine
 
-A high-performance order book matching engine built in C++ with Python bindings for strategy development and backtesting.
+A high-performance order book matching engine built in C++, with Redis pub/sub for real-time trade distribution and Python bindings for strategy development.
 
 ## Project Status
 
-**Phase 1: Core Order Book** - In Progress
+| Phase | Description | Status |
+|-------|-------------|--------|
+| 1 | Core C++ Engine | ✅ Complete |
+| 2 | Redis Integration | 🔄 In Progress |
+| 3 | Python + Live Market Data | ⬜ Planned |
+| 4 | Backtesting + Docker | ⬜ Planned |
 
 See [PLAN.md](PLAN.md) for detailed progress tracking.
 
-## Features (Planned)
+## What's Built
 
-- **C++ Matching Engine**: Price-time priority matching with <10µs latency
-- **Order Types**: Limit and Market orders
-- **Python Bindings**: Use the engine from Python via pybind11
-- **Backtesting**: Test strategies on historical data
-- **Redis Integration**: Real-time state sharing and pub/sub
+- **Price-time priority matching engine** — O(log n) add, O(1) cancel
+- **Order types** — Limit and Market orders
+- **Unit tests** — GoogleTest suite covering all core operations
+- **Benchmarks** — Google Benchmark measuring real latency
+- **Redis pub/sub** — C++ engine publishes trades to a Redis channel in real time
+- **GitHub Actions CI** — builds and tests on every push (GCC + Clang, Debug + Release)
+
+## Benchmark Results
+
+| Operation | Latency | Throughput |
+|-----------|---------|------------|
+| Add order | 0.14 µs | 7M orders/sec |
+| Cancel order | 0.13 µs | 8M orders/sec |
+| Match order | 0.22 µs | 4.5M orders/sec |
+| Best bid/ask query | 2.6 ns | 390M queries/sec |
 
 ## Project Structure
 
@@ -26,34 +41,51 @@ OrderBookEngine/
 │   └── GLOSSARY.md         # Trading terminology explained
 ├── cpp/
 │   ├── CMakeLists.txt      # Build configuration
-│   ├── include/            # Header files
-│   ├── src/                # Implementation files
-│   ├── tests/              # Unit tests
-│   └── benchmarks/         # Performance benchmarks
-└── python/                 # (Phase 3+)
+│   ├── include/            # Header files (.hpp)
+│   ├── src/                # Implementation files (.cpp)
+│   ├── tests/              # GoogleTest unit tests
+│   └── benchmarks/         # Google Benchmark latency tests
+└── python/                 # (Phase 3)
 ```
 
-## Building (Coming Soon)
+## Building
+
+**Dependencies:** CMake 3.16+, C++17 compiler, hiredis
+
+```bash
+# macOS
+brew install hiredis
+
+# Ubuntu
+apt install libhiredis-dev
+```
 
 ```bash
 cd cpp
-mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-cmake --build . -j$(nproc)
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+./build/orderbook_demo
 ```
 
-## Performance Targets
+## Running the Redis Demo
 
-| Metric | Target |
-|--------|--------|
-| Order add latency | < 10 µs |
-| Order cancel latency | < 1 µs |
-| Throughput | > 100,000 orders/sec |
+Start Redis, then in one terminal subscribe to trades:
+```bash
+redis-cli SUBSCRIBE trades
+```
+
+In another terminal run the demo:
+```bash
+./cpp/build/orderbook_demo
+```
+
+You will see trades published by the C++ engine appear in the subscriber terminal in real time.
 
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md) - Why we made each design decision
+- [Architecture](docs/ARCHITECTURE.md) - Design decisions and data structures
 - [Glossary](docs/GLOSSARY.md) - Trading terms explained
+- [Plan](PLAN.md) - Full roadmap and progress tracker
 
 ## License
 

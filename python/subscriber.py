@@ -1,7 +1,10 @@
 import redis
+import os
 
-# Connect to Redis (same default host/port as the C++ engine)
-client = redis.Redis(host="127.0.0.1", port=6379)
+REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
+
+# Connect to Redis — host read from env so Docker and local both work
+client = redis.Redis(host=REDIS_HOST, port=6379)
 pubsub = client.pubsub()
 
 # Subscribe to the trades channel
